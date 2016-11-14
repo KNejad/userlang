@@ -1,0 +1,43 @@
+<!doctype html>
+<head>
+
+	<title> UserLang Favorite language finder </title>
+</head>
+<body>
+	<script>
+function processName(){
+	var username = document.getElementById("form-user-name").value;
+	var url = "https://api.github.com/users/" + username;
+	httpGet(url,function(result) {
+		document.getElementById("output").innerHTML = result;
+	});
+	return false;
+
+
+}
+function httpGet(theUrl, callback){
+	var xmlHttp = new XMLHttpRequest();
+	xmlHttp.onreadystatechange = function() { 
+		if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+			callback(xmlHttp.responseText);
+		}
+	}
+	xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+	xmlHttp.send(null);
+}
+	</script>
+
+	<form name="search"  onsubmit="return processName()" >
+		Username: <input type="text" name="name" id="form-user-name">
+		<input type="submit" name="Submit" value="Submit">
+	</form>
+
+		<div id="output">
+		</div>
+</body>
+
+
+</html>
+
+
+
