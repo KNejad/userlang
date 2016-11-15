@@ -8,17 +8,34 @@
 function processName(){
 	var username = document.getElementById("form-user-name").value;
 	var url = "https://api.github.com/users/" + username + "/repos";
-	httpGet(url,function(response) {
+	httpGet(url,function getLanguages(response) {
 		var githubResult = JSON.parse(response);
 		numContributedRepos = Object.keys(githubResult).length;
 
 
 		//parse through each repo and get commits created by usernam
 		//greater than is OK because index starts at 0 so we want to stop counting one before reaching the contributedRepos
-		for (var repo = 0;  repo < numContributedRepos; repo++){
-			console.log(githubResult[repo]["commits_url"]);
+		var languages = [];
+		for (var repoNum = 0;  repoNum < numContributedRepos; repoNum++){
+			httpGet(githubResult[repoNum]["languages_url"], function printLanguages(responce){
+				githubResult = JSON.parse(responce);
+
+				numLanguages = Object.keys(githubResult).length;
+				var index = 0;
+				while(index < numLanguages){
+					if(Object.keys(githubResult)[index] in languages){
+						languages[Object.keys(githubResult)[index]] =  languages[Object.keys(githubResult)[index]] + githubResult[Object.keys(githubResult)[index]];
+					}else{
+						languages[Object.keys(githubResult)[index]] =  githubResult[Object.keys(githubResult)[index]];				
+					}
+					index++;
+				}
+			});
+
 		}
+		console.log(languages);
 	});
+	//returns false so page does not refresh
 	return false;
 
 
