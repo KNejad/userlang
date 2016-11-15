@@ -1,28 +1,36 @@
 <!doctype html>
 <head>
 
-	<title> UserLang Favorite language finder </title>
+	<title> UserLang | Favorite language finder </title>
 </head>
 <body>
 	<script>
 function processName(){
 	var username = document.getElementById("form-user-name").value;
-	var url = "https://api.github.com/users/" + username;
-	httpGet(url,function(result) {
-		document.getElementById("output").innerHTML = result;
+	var url = "https://api.github.com/users/" + username + "/repos";
+	httpGet(url,function(response) {
+		var githubResult = JSON.parse(response);
+		numContributedRepos = Object.keys(githubResult).length;
+
+
+		//parse through each repo and get commits created by usernam
+		//greater than is OK because index starts at 0 so we want to stop counting one before reaching the contributedRepos
+		for (var repo = 0;  repo < numContributedRepos; repo++){
+			console.log(githubResult[repo]["commits_url"]);
+		}
 	});
 	return false;
 
 
 }
-function httpGet(theUrl, callback){
+function httpGet(url, callback){
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.onreadystatechange = function() { 
 		if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
 			callback(xmlHttp.responseText);
 		}
 	}
-	xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+	xmlHttp.open("GET", url, true); 
 	xmlHttp.send(null);
 }
 	</script>
@@ -32,8 +40,6 @@ function httpGet(theUrl, callback){
 		<input type="submit" name="Submit" value="Submit">
 	</form>
 
-		<div id="output">
-		</div>
 </body>
 
 
