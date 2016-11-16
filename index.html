@@ -8,36 +8,49 @@
 function processName(){
 	var username = document.getElementById("form-user-name").value;
 	var url = "https://api.github.com/users/" + username + "/repos";
+	var languages = {};
 	httpGet(url,function getLanguages(response) {
 		var githubResult = JSON.parse(response);
-		numContributedRepos = Object.keys(githubResult).length;
-
-
-		//parse through each repo and get commits created by usernam
-		//greater than is OK because index starts at 0 so we want to stop counting one before reaching the contributedRepos
-		var languages = [];
+		var numContributedRepos = Object.keys(githubResult).length;
+		//parse through each repo and get commits created by username
+		//greater than is OK because index starts at 0 so we want to stop counting one before reaching the length of contributedRepos
 		for (var repoNum = 0;  repoNum < numContributedRepos; repoNum++){
 			httpGet(githubResult[repoNum]["languages_url"], function printLanguages(responce){
 				githubResult = JSON.parse(responce);
-
-				numLanguages = Object.keys(githubResult).length;
-				var index = 0;
-				while(index < numLanguages){
-					if(Object.keys(githubResult)[index] in languages){
-						languages[Object.keys(githubResult)[index]] =  languages[Object.keys(githubResult)[index]] + githubResult[Object.keys(githubResult)[index]];
+				for (language in githubResult){
+					//checks to see if the language has been added already
+					if(language in languages){
+						languages[language] = languages[language] + githubResult[language];
 					}else{
-						languages[Object.keys(githubResult)[index]] =  githubResult[Object.keys(githubResult)[index]];				
+						languages[language] = githubResult[language];
 					}
-					index++;
 				}
 			});
-
 		}
-		console.log(languages);
+		//replace delay with wait for get requests to return
+		setTimeout(function() {
+			getHighest(languages);
+		}, 1000);			
+
+
 	});
 	//returns false so page does not refresh
 	return false;
 
+
+}
+function getHighest(languages){
+	console.log(languages);
+	var largestLines = 0;
+	var largestLanguage;
+	for (var language in languages){
+		if (languages[language] > largestLines){
+			largestLines = languages[language];
+			largestLanguage = language;
+		}
+	}
+	console.log(largestLanguage);
+	console.log(largestLines);
 
 }
 function httpGet(url, callback){
@@ -53,7 +66,7 @@ function httpGet(url, callback){
 	</script>
 
 	<form name="search"  onsubmit="return processName()" >
-		Username: <input type="text" name="name" id="form-user-name">
+		Username: <input type="text" name="name" value="knejad" id="form-user-name">
 		<input type="submit" name="Submit" value="Submit">
 	</form>
 
