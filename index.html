@@ -9,6 +9,10 @@ function processName(){
 	var username = document.getElementById("form-user-name").value;
 	var url = "https://api.github.com/users/" + username + "/repos";
 	var languages = {};
+
+	//resets the table to nothing 
+	document.getElementById("fav-languages").innerHTML = "";				
+
 	httpGet(url,function getLanguages(response) {
 		var githubResult = JSON.parse(response);
 		var numContributedRepos = Object.keys(githubResult).length;
@@ -30,10 +34,14 @@ function processName(){
 
 				//when all calls have been processed then this is run
 				if( ajaxReturns == numContributedRepos){
-					favouriteLanguage = getHighest(languages);
-					document.getElementById("fav-language").innerHTML = username + "'s favourite language is probably " + favouriteLanguage["language"];
-					document.getElementById("fav-lines").innerHTML = "They have written " + favouriteLanguage["lines"] + " lines of code in " + favouriteLanguage["language"];
-				}
+					sortedLanguages = sort(languages);
+					var output = "<table> <th>Language</th> <th>Lines</th>";
+					for (var index =0;  index < sortedLanguages.length; index++){
+						output += "<tr><td>" +  sortedLanguages[index][0] + "</td><td>" + sortedLanguages[index][1] +  "</td?</tr>";
+						console.log(language);
+					}
+					output += "</table>"
+					document.getElementById("fav-languages").innerHTML = output;				}
 
 			});
 		}
@@ -45,17 +53,19 @@ function processName(){
 
 
 }
-function getHighest(languages){
-	var largestLines = 0;
-	var largestLanguage;
-	for (var language in languages){
-		if (languages[language] > largestLines){
-			largestLines = languages[language];
-			largestLanguage = language;
-		}
-	}
-	var favouriteLanguage = {"language": largestLanguage,"lines":  largestLines};
-	return favouriteLanguage;
+
+//sorts a dictionary see http://stackoverflow.com/a/25500462/5922350
+function sort(dict){
+	var items = Object.keys(dict).map(function(key) {
+		return [key, dict[key]];
+	});
+
+	items.sort(function(first, second) {
+		return second[1] - first[1];
+	});
+
+	return items;
+
 }
 function httpGet(url, callback){
 	var xmlHttp = new XMLHttpRequest();
@@ -70,11 +80,10 @@ function httpGet(url, callback){
 	</script>
 
 	<form name="search"  onsubmit="return processName()" >
-		Username: <input type="text" name="name" value="knejad" id="form-user-name">
+		Username: <input type="text" name="name" id="form-user-name">
 		<input type="submit" name="Submit" value="Submit">
 	</form>
-		<div id="fav-language"></div>
-		<div id="fav-lines"></div>
+		<div id="fav-languages"></div>
 
 </body>
 
