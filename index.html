@@ -11,11 +11,15 @@ function processName(){
 	var languages = {};
 
 	//resets the table to nothing 
-	document.getElementById("fav-languages").innerHTML = "";				
+	document.getElementById("output").innerHTML = "";				
 
 	httpGet(url,function getLanguages(response) {
 		var githubResult = JSON.parse(response);
 		var numContributedRepos = Object.keys(githubResult).length;
+		if(numContributedRepos == 0){
+			document.getElementById("output").innerHTML = "The user does not have any repos";
+			return false;			
+		}
 		var ajaxReturns =0;
 		//parse through each repo and get commits created by username
 		//greater than is OK because index starts at 0 so we want to stop counting one before reaching the length of contributedRepos
@@ -38,10 +42,10 @@ function processName(){
 					var output = "<table> <th>Language</th> <th>Lines</th>";
 					for (var index =0;  index < sortedLanguages.length; index++){
 						output += "<tr><td>" +  sortedLanguages[index][0] + "</td><td>" + sortedLanguages[index][1] +  "</td?</tr>";
-						console.log(language);
 					}
 					output += "</table>"
-					document.getElementById("fav-languages").innerHTML = output;				}
+					document.getElementById("output").innerHTML = output;	
+				}
 
 			});
 		}
@@ -55,6 +59,7 @@ function processName(){
 }
 
 //sorts a dictionary see http://stackoverflow.com/a/25500462/5922350
+//UNBOXED: This function is not my code but I did not see the point in reinventing the wheel, so I decided the best approach was to copy it
 function sort(dict){
 	var items = Object.keys(dict).map(function(key) {
 		return [key, dict[key]];
@@ -72,6 +77,14 @@ function httpGet(url, callback){
 	xmlHttp.onreadystatechange = function() { 
 		if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
 			callback(xmlHttp.responseText);
+		}else
+		//if browser recieves a 404 "not found" from a get request and the url contains "https://api.github.com/users/" ; This means the username does not exist
+		if (xmlHttp.readyState == 4 && xmlHttp.status == 404 && url.includes("https://api.github.com/users/")){
+			document.getElementById("output").innerHTML = "The username you entered does not exist";				
+		}else
+		//if browser recieves a 403 "forbidden" from a get request; This means too many requests have been made
+		if (xmlHttp.readyState == 4 && xmlHttp.status == 403){
+			document.getElementById("output").innerHTML = "The username you entered does not exist";				
 		}
 	}
 	xmlHttp.open("GET", url, true); 
@@ -83,7 +96,7 @@ function httpGet(url, callback){
 		Username: <input type="text" name="name" id="form-user-name">
 		<input type="submit" name="Submit" value="Submit">
 	</form>
-		<div id="fav-languages"></div>
+		<div id="output"></div>
 
 </body>
 
