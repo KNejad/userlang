@@ -1,7 +1,7 @@
 <!doctype html>
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-
+	<meta charset="UTF-8">
 	<title> UserLang | GitHub User Favourite language finder </title>
 	<style>
 body{
@@ -11,20 +11,26 @@ body{
 input[type=text]{
 	margin: 0;
 	min-width: 40%; 
-	line-height: 40px; font-size: 17px;
+	line-height: 40px;
+       	font-size: 17px;
 	border: 1px solid #bbb;	
 }
+
 table{
 	background-color: #cee1ff;
 }
+
 td,th{
 	padding: 20px;
 	border: 1px solid black;
 }
+
 	</style>
 </head>
 <body>
 	<script>
+
+//processes the username in the text field
 function processName(){
 	var username = document.getElementById("form-user-name").value;
 	var url = "https://api.github.com/users/" + username + "/repos";
@@ -92,6 +98,8 @@ function sort(dict){
 	return items;
 
 }
+
+//Performs an Async HTTP Get Request
 function httpGet(url, callback){
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.onreadystatechange = function() { 
@@ -104,7 +112,7 @@ function httpGet(url, callback){
 			}else
 				//if browser recieves a 403 "forbidden" from a get request; This means too many requests have been made
 				if (xmlHttp.readyState == 4 && xmlHttp.status == 403){
-					document.getElementById("output").innerHTML = "The username you entered does not exist";				
+					document.getElementById("output").innerHTML = "Too many requests have been made; Please try again in an hour";				
 				}
 	}
 	xmlHttp.open("GET", url, true); 
