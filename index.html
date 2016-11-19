@@ -1,7 +1,27 @@
 <!doctype html>
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<title> UserLang | Favorite language finder </title>
+	<title> UserLang | GitHub User Favourite language finder </title>
+	<style>
+body{
+	text-align: center;
+	background:#d3e3f3; 
+}
+input[type=text]{
+	margin: 0;
+	min-width: 40%; 
+	line-height: 40px; font-size: 17px;
+	border: 1px solid #bbb;	
+}
+table{
+	background-color: #cee1ff;
+}
+td,th{
+	padding: 20px;
+	border: 1px solid black;
+}
+	</style>
 </head>
 <body>
 	<script>
@@ -39,12 +59,12 @@ function processName(){
 				//when all calls have been processed then this is run
 				if( ajaxReturns == numContributedRepos){
 					sortedLanguages = sort(languages);
-					var output = "<table> <th>Language</th> <th>Lines</th>";
+					var output = "<table align='center'> <th>Language</th> <th>Lines</th>";
 					for (var index =0;  index < sortedLanguages.length; index++){
 						output += "<tr><td>" +  sortedLanguages[index][0] + "</td><td>" + sortedLanguages[index][1] +  "</td?</tr>";
 					}
 					output += "</table>"
-					document.getElementById("output").innerHTML = output;	
+						document.getElementById("output").innerHTML = output;	
 				}
 
 			});
@@ -78,25 +98,31 @@ function httpGet(url, callback){
 		if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
 			callback(xmlHttp.responseText);
 		}else
-		//if browser recieves a 404 "not found" from a get request and the url contains "https://api.github.com/users/" ; This means the username does not exist
-		if (xmlHttp.readyState == 4 && xmlHttp.status == 404 && url.includes("https://api.github.com/users/")){
-			document.getElementById("output").innerHTML = "The username you entered does not exist";				
-		}else
-		//if browser recieves a 403 "forbidden" from a get request; This means too many requests have been made
-		if (xmlHttp.readyState == 4 && xmlHttp.status == 403){
-			document.getElementById("output").innerHTML = "The username you entered does not exist";				
-		}
+			//if browser recieves a 404 "not found" from a get request and the url contains "https://api.github.com/users/" ; This means the username does not exist
+			if (xmlHttp.readyState == 4 && xmlHttp.status == 404 && url.includes("https://api.github.com/users/")){
+				document.getElementById("output").innerHTML = "The username you entered does not exist";				
+			}else
+				//if browser recieves a 403 "forbidden" from a get request; This means too many requests have been made
+				if (xmlHttp.readyState == 4 && xmlHttp.status == 403){
+					document.getElementById("output").innerHTML = "The username you entered does not exist";				
+				}
 	}
 	xmlHttp.open("GET", url, true); 
 	xmlHttp.send(null);
 }
 	</script>
 
+	<h1> UserLang </h1>
+	<h2> GitHub User Favourite language finder </h2> 
 	<form name="search"  onsubmit="return processName()" >
-		Username: <input type="text" name="name" id="form-user-name">
+		<p> Input a GitHub username and you will get a list of their favourite languages </p>
+		<input type="text" name="name" id="form-user-name">
+		<br>
 		<input type="submit" name="Submit" value="Submit">
 	</form>
-		<div id="output"></div>
+		<br>
+		<br>
+	<div id="output"></div>
 
 </body>
 
